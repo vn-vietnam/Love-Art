@@ -1,31 +1,46 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { callApi } from "@/api";
+import Categories from "@/components/Categories";
+import ImageGrid from "@/components/ImageGrid";
+import Loading from "@/components/Loading";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 export default function TabOneScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
-  );
+	const [activeCate, setActiveCate] = useState<any>(null);
+	const [images, setImages] = useState<any[]>([]);
+	const handleCate = (cate: any) => {
+		setActiveCate(cate);
+	};
+	const fetchData = async (num: any) => {
+		let res = await callApi(activeCate, num);
+		setImages(res.hits);
+	};
+	useEffect(() => {
+		fetchData(1);
+	}, [activeCate]);
+	return (
+		<Animated.ScrollView style={styles.container}>
+			<Categories activeCate={activeCate} handleCate={handleCate} />
+			<View style={{}}>
+				{images.length !== 0 ? <ImageGrid images={images} /> : <Loading />}
+			</View>
+		</Animated.ScrollView>
+	);
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
+	container: {
+		flex: 1,
+		backgroundColor: "#eafaf1",
+	},
+	title: {
+		fontSize: 20,
+		fontWeight: "bold",
+	},
+	separator: {
+		marginVertical: 30,
+		height: 1,
+		width: "80%",
+	},
 });
